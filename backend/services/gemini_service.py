@@ -1,7 +1,9 @@
 import os
 import requests
 
-GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent'
+# Allow configuring model; default to cost-efficient Flash 2.0
+GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.0-flash')
+GEMINI_API_URL = f'https://generativelanguage.googleapis.com/v1/models/{GEMINI_MODEL}:generateContent'
 
 # Utility for Gemini API call
 

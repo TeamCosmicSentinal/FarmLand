@@ -1,0 +1,4 @@
+.card input[type="email"], .card input[type="password"], .card input[type="text"] {
+  @apply border border-hemlock bg-offwhite text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-leaf outline-none transition w-full;
+}
+.card .link { @apply text-leaf underline underline-offset-2 hover:text-olive; }

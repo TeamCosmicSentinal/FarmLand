@@ -34,8 +34,8 @@ const states = [
   const schemes = state === 'All' ? allSchemes : allSchemes.filter(s => s.state === state || s.state === 'All');
 
   return (
-    <div>
-      <div className="bg-offwhite p-8 rounded-2xl shadow-card border border-hemlock">
+    <div className="space-y-8">
+      <div className="card bg-card border border-primary/20 rounded-2xl shadow-card p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <h2 className="text-2xl font-heading font-bold text-olive flex items-center gap-2">
             <span role="img" aria-label="schemes">🏛️</span> Active Farmer Schemes
@@ -61,7 +61,7 @@ const states = [
           ))}
         </div>
       </div>
-      <div className="mt-8">
+      <div className="card bg-card border border-primary/20 rounded-2xl shadow-card p-6">
         <h3 className="text-lg font-heading font-bold text-leaf mb-2 flex items-center gap-2">
           <span role="img" aria-label="links">🔗</span> Important Government Links
         </h3>

@@ -11,12 +11,14 @@ from routes.crop_health import crop_health_bp
 from routes.dashboard import dashboard_bp
 from routes.satellite_insight import satellite_insight_bp
 from routes.crop_prices import crop_prices_bp
+from routes.marketplace import marketplace_bp
+from routes.auth import auth_bp
 
 # Load environment variables from .env
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=False)
 
 # Register Blueprints
 app.register_blueprint(crop_recommend_bp, url_prefix='/api/crop-recommend')
@@ -28,6 +30,10 @@ app.register_blueprint(crop_health_bp, url_prefix='/api/crop-health')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(satellite_insight_bp, url_prefix='/api/satellite-insight')
 app.register_blueprint(crop_prices_bp, url_prefix='/api/crop-prices')
+app.register_blueprint(marketplace_bp, url_prefix='/api/marketplace')
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    # Use environment variable FLASK_DEBUG for local development; default to False for deployment readiness
+    debug = os.getenv('FLASK_DEBUG', '0') in ('1', 'true', 'True')
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', '5000')), debug=debug)

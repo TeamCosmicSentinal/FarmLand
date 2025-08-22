@@ -21,7 +21,12 @@ def get_crop_prices():
             }), 400
         
         # Fetch real-time crop prices using Gemini API
-        prices_data = get_real_crop_prices(location, crop_name)
+        try:
+            prices_data = get_real_crop_prices(location, crop_name)
+        except Exception:
+            # Graceful fallback if Gemini fails
+            from services.crop_prices_service import get_fallback_prices
+            prices_data = get_fallback_prices(location, crop_name)
         
         # Get market insights
         try:

@@ -125,8 +125,8 @@ const CropPricesForm = () => {
   return (
     <div className="max-w-4xl mx-auto">
       {/* Search Form */}
-      <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
+      <div className="bg-offwhite rounded-2xl shadow-card p-6 mb-8 border border-hemlock">
+        <h2 className="text-2xl font-heading font-bold text-olive mb-6 text-center">
           Search Crop Prices
         </h2>
         
@@ -225,7 +225,7 @@ const CropPricesForm = () => {
 
       {/* Results */}
       {prices && (
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-offwhite rounded-2xl shadow-card p-6 border border-hemlock">
           <div className="text-center mb-6">
             <h3 className="text-2xl font-semibold text-green-700 mb-2">
               {getCropIcon(prices.crop_name)} {prices.crop_name} Prices in {prices.location}
@@ -237,7 +237,7 @@ const CropPricesForm = () => {
 
           <div className="grid gap-6">
             {prices.mandi_prices.map((mandi, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+              <div key={index} className="feature-gold md:feature-green border border-hemlock rounded-xl p-6 shadow-card transition-all duration-200 hover:scale-[1.01]">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-xl font-semibold text-gray-800">
                     🏪 {mandi.mandi_name}
@@ -290,7 +290,7 @@ const CropPricesForm = () => {
           </div>
 
           {/* Market Insights */}
-          <div className="mt-8 p-6 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+          <div className="mt-8 p-6 feature-gold rounded-xl border border-hemlock shadow-card">
             <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
               💡 Market Insights
             </h4>

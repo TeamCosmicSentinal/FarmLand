@@ -1,0 +1,11 @@
+- Add imports:
+import ProtectedRoute from './components/ProtectedRoute';
+import LoginPageWrapper from './components/LoginPageWrapper';
+import RegisterPageWrapper from './components/RegisterPageWrapper';
+
+- Wrap Dashboard route:
+<Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+
+- Add routes:
+<Route path="/login" element={<LoginPageWrapper />} />
+<Route path="/register" element={<RegisterPageWrapper />} />

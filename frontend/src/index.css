@@ -1,92 +1,155 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Base styles */
 body {
   font-family: 'Open Sans', Inter, sans-serif;
-  @apply bg-sky text-olive transition-colors duration-300 antialiased;
+  @apply bg-background text-text transition-colors duration-300 antialiased;
 }
 
+/* Typography */
 h1, .h1, h2, .h2 {
   font-family: 'Poppins', 'Montserrat', sans-serif;
-  @apply text-olive font-heading font-bold leading-tight mb-6;
+  @apply text-olive font-heading font-bold leading-tight tracking-tight mb-6;
 }
 h1, .h1 {
-  @apply text-5xl md:text-6xl;
+  @apply text-4xl sm:text-5xl md:text-6xl;
 }
 h2, .h2 {
-  @apply text-3xl md:text-4xl;
+  @apply text-2xl sm:text-3xl md:text-4xl;
 }
 h3, .h3, h4, .h4 {
   font-family: 'Poppins', 'Montserrat', sans-serif;
-  @apply text-leaf font-heading font-semibold mb-2;
+  @apply text-leaf font-heading font-semibold tracking-wide mb-3;
 }
 h3, .h3 {
-  @apply text-2xl;
+  @apply text-xl sm:text-2xl;
 }
 h4, .h4 {
-  @apply text-xl;
+  @apply text-lg sm:text-xl;
+}
+p {
+  @apply leading-relaxed mb-4;
 }
 
+/* Layout elements */
 header, .header, footer, .footer {
-  @apply bg-hemlock text-offwhite font-heading shadow-card;
+  @apply bg-hemlock text-offwhite font-heading shadow-md;
 }
 
 section {
-  @apply py-12 md:py-16 px-4 md:px-8 bg-sky text-olive rounded-2xl shadow-soft;
+  @apply py-10 sm:py-12 md:py-16 px-4 sm:px-6 md:px-8 bg-sky text-olive rounded-2xl shadow-md transition-all duration-300;
+}
+
+.container-custom {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 md:px-8;
 }
 
 .divider, .divider-secondary {
-  @apply border-t border-primary/30 my-10 transition-colors duration-200;
+  @apply border-t border-primary/20 my-8 transition-colors duration-200;
 }
 
 .white-space {
-  @apply my-8 md:my-12;
+  @apply my-6 sm:my-8 md:my-12;
 }
 
+/* Buttons */
 button, .btn {
-  @apply font-heading font-semibold px-8 py-3 rounded-xl shadow-card transition-all duration-200 focus:outline-none border-2;
+  @apply font-heading font-semibold px-5 py-2.5 rounded-lg text-sm shadow-md transition-all duration-200 focus:outline-none border border-primary/10 hover:border-primary/30 hover:shadow-lg active:shadow-sm;
 }
 .btn-gold {
-  @apply bg-gold text-olive border-gold hover:bg-softgreen hover:text-olive;
+  @apply bg-gold text-olive hover:bg-gold-light;
 }
 .btn-green {
-  @apply bg-softgreen text-olive border-softgreen hover:bg-gold hover:text-olive;
+  @apply bg-accent text-white hover:bg-accent-hover;
+}
+.btn-outline {
+  @apply bg-transparent border border-primary text-primary hover:bg-primary/5;
+}
+.btn-sm {
+  @apply px-3 py-1.5 text-xs;
+}
+.btn-lg {
+  @apply px-6 py-3 text-base;
 }
 
+/* Links */
 a, .link {
-  @apply text-black transition-colors duration-200 underline-offset-2;
+  @apply text-primary-light font-medium transition-colors duration-200 underline-offset-2;
   text-decoration: none;
 }
 a:hover, .link:hover {
-  @apply underline;
+  @apply text-primary underline;
 }
 
+/* Feature boxes */
 .feature-gold {
-  @apply bg-gold text-olive rounded-2xl p-8 shadow-card font-sans;
+  @apply bg-gold text-olive rounded-2xl p-6 sm:p-8 shadow-md font-sans border border-gold-light/30 hover:shadow-lg transition-all duration-300;
 }
 .feature-green {
-  @apply bg-softgreen text-olive rounded-2xl p-8 shadow-card font-sans;
+  @apply bg-softgreen text-olive rounded-2xl p-6 sm:p-8 shadow-md font-sans border border-softgreen-light/30 hover:shadow-lg transition-all duration-300;
 }
 
+/* Cards */
 .card, .glass-card {
-  @apply bg-card text-text rounded-2xl shadow-card p-8 border border-primary/20 transition-all duration-200;
+  @apply bg-card text-text rounded-2xl shadow-md p-6 sm:p-8 border border-primary/10 hover:border-primary/20 transition-all duration-300 hover:shadow-lg;
+}
+.card-alt {
+  @apply bg-card-alt text-text rounded-2xl shadow-md p-6 sm:p-8 border border-primary/10 hover:border-primary/20 transition-all duration-300 hover:shadow-lg;
 }
 
+/* Animations */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.animate-shake {
+  animation: shake 0.8s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-in-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form elements */
 input, select, textarea {
-  @apply bg-offwhite text-olive border border-hemlock/30 rounded-lg p-3 focus:ring-2 focus:ring-leaf outline-none transition-colors duration-200;
+  @apply bg-offwhite text-text border border-hemlock/20 rounded-lg p-3 focus:ring-2 focus:ring-accent focus:border-accent/50 outline-none transition-all duration-200 shadow-sm;
+}
+
+label {
+  @apply block text-sm font-medium text-text-muted mb-1;
+}
+
+/* Status indicators */
+.badge {
+  @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+}
+.badge-success {
+  @apply bg-success-light text-success;
+}
+.badge-error {
+  @apply bg-error-light text-error;
 }
 
 /* Responsive and accessibility helpers */
 .responsive-section {
-  @apply px-4 md:px-8 py-12 md:py-16;
+  @apply px-4 sm:px-6 md:px-8 py-10 sm:py-12 md:py-16;
 }
 
 .focus-ring {
-  @apply focus:outline-none focus:ring-2 focus:ring-leaf;
+  @apply focus:outline-none focus:ring-2 focus:ring-accent;
 }
 
+/* Animations */
 @keyframes gradient-move {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -94,6 +157,14 @@ input, select, textarea {
 .animate-gradient-move {
   background-size: 200% 200%;
   animation: gradient-move 8s ease-in-out infinite;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
 }
 
 .imessage-tail-right::after {
@@ -115,4 +186,21 @@ input, select, textarea {
   height: 20px;
   background: url('data:image/svg+xml;utf8,<svg width="16" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M16 20 Q0 0 0 20 Z" fill="%23F8FAFC"/></svg>') no-repeat;
   background-size: contain;
+}
+
+/* Utility variants for consistent cards/sections */
+.card-sm {
+  @apply bg-card text-text rounded-2xl shadow-card p-6 border border-primary/20 transition-all duration-200;
+}
+.card-flat {
+  @apply bg-card text-text rounded-2xl shadow-card p-4 border border-primary/20 transition-all duration-200;
+}
+.feature-item {
+  @apply border border-hemlock rounded-xl p-4 shadow-card;
+}
+.section-panel {
+  @apply bg-card text-olive rounded-2xl shadow-card;
+}
+.text-muted {
+  @apply text-olive/80;
 }

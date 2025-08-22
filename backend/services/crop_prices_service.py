@@ -88,8 +88,10 @@ def _fetch_gemini_prices(location, crop_name):
     Only return valid JSON, no additional text or explanations.
     """
     try:
+        # Use the same configurable model as the gemini_service
+        GEMINI_MODEL = os.getenv('GEMINI_MODEL', 'gemini-2.0-flash')
         response = requests.post(
-            f"https://generativelanguage.googleapis.com/v1/models/gemini-2.5-pro:generateContent?key={GEMINI_API_KEY}",
+            f"https://generativelanguage.googleapis.com/v1/models/{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}",
             json={
                 "contents": [{"parts": [{"text": prompt}]}]
             }
