@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600;700&family=Inter:wght@400;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Open Sans', Inter, sans-serif;
+  @apply bg-sky text-olive transition-colors duration-300 antialiased;
+}
+
+h1, .h1, h2, .h2 {
+  font-family: 'Poppins', 'Montserrat', sans-serif;
+  @apply text-olive font-heading font-bold leading-tight mb-6;
+}
+h1, .h1 {
+  @apply text-5xl md:text-6xl;
+}
+h2, .h2 {
+  @apply text-3xl md:text-4xl;
+}
+h3, .h3, h4, .h4 {
+  font-family: 'Poppins', 'Montserrat', sans-serif;
+  @apply text-leaf font-heading font-semibold mb-2;
+}
+h3, .h3 {
+  @apply text-2xl;
+}
+h4, .h4 {
+  @apply text-xl;
+}
+
+header, .header, footer, .footer {
+  @apply bg-hemlock text-offwhite font-heading shadow-card;
+}
+
+section {
+  @apply py-12 md:py-16 px-4 md:px-8 bg-sky text-olive rounded-2xl shadow-soft;
+}
+
+.divider, .divider-secondary {
+  @apply border-t border-primary/30 my-10 transition-colors duration-200;
+}
+
+.white-space {
+  @apply my-8 md:my-12;
+}
+
+button, .btn {
+  @apply font-heading font-semibold px-8 py-3 rounded-xl shadow-card transition-all duration-200 focus:outline-none border-2;
+}
+.btn-gold {
+  @apply bg-gold text-olive border-gold hover:bg-softgreen hover:text-olive;
+}
+.btn-green {
+  @apply bg-softgreen text-olive border-softgreen hover:bg-gold hover:text-olive;
+}
+
+a, .link {
+  @apply text-black transition-colors duration-200 underline-offset-2;
+  text-decoration: none;
+}
+a:hover, .link:hover {
+  @apply underline;
+}
+
+.feature-gold {
+  @apply bg-gold text-olive rounded-2xl p-8 shadow-card font-sans;
+}
+.feature-green {
+  @apply bg-softgreen text-olive rounded-2xl p-8 shadow-card font-sans;
+}
+
+.card, .glass-card {
+  @apply bg-card text-text rounded-2xl shadow-card p-8 border border-primary/20 transition-all duration-200;
+}
+
+input, select, textarea {
+  @apply bg-offwhite text-olive border border-hemlock/30 rounded-lg p-3 focus:ring-2 focus:ring-leaf outline-none transition-colors duration-200;
+}
+
+/* Responsive and accessibility helpers */
+.responsive-section {
+  @apply px-4 md:px-8 py-12 md:py-16;
+}
+
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-leaf;
+}
+
+@keyframes gradient-move {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-move {
+  background-size: 200% 200%;
+  animation: gradient-move 8s ease-in-out infinite;
+}
+
+.imessage-tail-right::after {
+  content: '';
+  position: absolute;
+  right: -10px;
+  bottom: 0;
+  width: 16px;
+  height: 20px;
+  background: url('data:image/svg+xml;utf8,<svg width="16" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20 Q16 0 16 20 Z" fill="%234CD964"/></svg>') no-repeat;
+  background-size: contain;
+}
+.imessage-tail-left::after {
+  content: '';
+  position: absolute;
+  left: -10px;
+  bottom: 0;
+  width: 16px;
+  height: 20px;
+  background: url('data:image/svg+xml;utf8,<svg width="16" height="20" xmlns="http://www.w3.org/2000/svg"><path d="M16 20 Q0 0 0 20 Z" fill="%23F8FAFC"/></svg>') no-repeat;
+  background-size: contain;
+}
