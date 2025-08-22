@@ -46,6 +46,8 @@ function Home() {
         <FeatureCard title="Crop Prices" desc="Get the latest mandi prices for crops in your area to make informed selling decisions." variant="gold" />
         <FeatureCard title="AI Chatbot" desc="Get instant answers to your farming questions in English, Hindi, or Kannada, powered by Gemini AI." variant="green" />
         <FeatureCard title="Satellite Insight" desc="Get NDVI and crop health insights from satellite data for your field or village." variant="gold" />
+        <FeatureCard title="Marketplace" desc="List your crops in the website and let others know about the availablity of crops." variant="green" />
+        <FeatureCard title="UI" desc="Single page interface to ensure friendly interface for the farmers without any hastle." variant="gold" />
       </div>
       {/* Team Button (fixed bottom right) */}
       <button
