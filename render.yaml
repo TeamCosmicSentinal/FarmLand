@@ -6,7 +6,7 @@ services:
     buildCommand: |
       python -m pip install --upgrade pip setuptools wheel
       pip install -r backend/requirements.txt
-    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT wsgi:application
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT backend.wsgi:application
     healthCheckPath: /health
     autoDeploy: true
     envVars:
@@ -26,11 +26,9 @@ services:
         sync: false
       - key: ADMIN_SECRET
         sync: false
+      # Set this to your frontend public URL later (e.g., https://agriguru-frontend.onrender.com)
       - key: FRONTEND_ORIGIN
-        fromService:
-          name: agriguru-frontend
-          type: web
-          property: url
+        value: "*"
 
   - type: web
     name: agriguru-frontend
@@ -40,8 +38,6 @@ services:
     startCommand: cd frontend && npx serve -s build -l $PORT
     autoDeploy: true
     envVars:
+      # Set this to your backend public URL later (e.g., https://agriguru-backend.onrender.com)
       - key: REACT_APP_API_BASE
-        fromService:
-          name: agriguru-backend
-          type: web
-          property: url
+        sync: false
