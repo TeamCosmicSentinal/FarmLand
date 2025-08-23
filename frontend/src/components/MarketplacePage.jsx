@@ -1,7 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { addMarketplaceListing, getMarketplaceListings, deleteMarketplaceListing } from '../api/api';
+import React, { useEffect, useMemo, useState } from 'react';
+import { addMarketplaceListing, getMarketplaceListings, deleteMarketplaceListing, verifyCertification, reportSuspiciousProduct, suVerifyCrop, suDeleteCrop } from '../api/api';
+import { useAuth } from './AuthContext';
+
+function mapStatus(status) {
+  const s = (status || '').toLowerCase();
+  if (s.includes('likely certified') || s === 'certified') return { label: 'Certified', cls: 'bg-green-100 text-green-800 border-green-300', icon: '✅' };
+  if (s.includes('likely not certified') || s.includes('not certified')) return { label: 'Not Certified', cls: 'bg-red-100 text-red-800 border-red-300', icon: '⚠️' };
+  return { label: 'Unverified', cls: 'bg-gray-100 text-gray-700 border-gray-300', icon: 'ℹ️' };
+}
+function StatusBadge({ status, superuserVerified }) {
+  if (superuserVerified) {
+    return <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full border bg-green-100 text-green-800 border-green-300`}>🛡️ Verified by AgriGuru</span>;
+  }
+  const u = mapStatus(status);
+  return <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded-full border ${u.cls}`}>{u.icon} {u.label}</span>;
+}
 
 export default function MarketplacePage() {
+  const { user } = useAuth();
+  const isSuperuser = (user?.role === 'superuser');
   const [form, setForm] = useState({
     crop_name: '',
     quantity: '',
@@ -12,12 +29,24 @@ export default function MarketplacePage() {
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [verifications, setVerifications] = useState({}); // id -> {status, explanation}
 
   const loadListings = async () => {
     try {
       setError(null);
       const res = await getMarketplaceListings();
-      setListings(res.data || []);
+      const items = res.data || [];
+      setListings(items);
+      // Auto-verify asynchronously per item (no DB, demo only)
+      items.forEach(async (it) => {
+        try {
+          // Use crop_name; backend accepts crop_name as fallback
+          const r = await verifyCertification({ crop_name: it.crop_name, origin: it.location, extra: { listing_id: it.id } });
+          setVerifications(prev => ({ ...prev, [it.id]: r.data }));
+        } catch (e) {
+          // ignore verification errors per item
+        }
+      });
     } catch (e) {
       setError('Failed to load listings');
     }
@@ -53,6 +82,15 @@ export default function MarketplacePage() {
     }
   };
 
+  const onReport = async (it) => {
+    try {
+      await reportSuspiciousProduct({ product_id: '', crop_name: it.crop_name, reason: 'Suspicious listing', details: `Reported from marketplace card ${it.id}` });
+      alert('Report submitted. Thank you!');
+    } catch (e) {
+      alert('Failed to submit report');
+    }
+  };
+
   return (
     <section className="bg-gradient-to-br from-sky via-background to-sky-light text-olive rounded-2xl shadow-lg min-h-[40vh]">
       <div className="w-full max-w-6xl mx-auto pt-4 pb-6 px-4 md:px-8">
@@ -80,7 +118,7 @@ export default function MarketplacePage() {
             </label>
             <input
               className="px-3 py-2 rounded-lg border border-primary/20 focus:border-accent focus:ring-2 focus:ring-accent/20 outline-none transition-all duration-200"
-              placeholder="e.g., Wheat"
+              placeholder="e.g., Basmati Rice"
               name="crop_name"
               value={form.crop_name}
               onChange={onChange}
@@ -182,16 +220,20 @@ export default function MarketplacePage() {
             const colors = ['bg-softgreen/20', 'bg-gold/20', 'bg-sky/40', 'bg-background-alt'];
             const colorIndex = item.crop_name.length % colors.length;
             const cardColor = colors[colorIndex];
-            
+            const v = verifications[item.id];
+            const isOwner = String(user?.id || '') === (item.owner_sub || '');
+
             return (
               <div key={item.id} className={`relative overflow-hidden ${cardColor} border border-primary/10 p-6 rounded-2xl shadow-card hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1`}>
                 <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden">
                   <div className="bg-accent text-white text-xs font-bold px-4 py-1 rotate-45 transform origin-bottom-right translate-y-7 shadow-sm">CROP</div>
                 </div>
                 
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-2">
                   <h3 className="text-xl font-heading font-bold text-primary">{item.crop_name}</h3>
+                  <div>{item.verified_by_superuser ? <StatusBadge superuserVerified /> : (v ? <StatusBadge status={v.status} /> : <span className="text-[11px] text-olive/60">Verifying...</span>)}</div>
                 </div>
+                {/* Hide verbose AI explanation on marketplace cards */}
                 
                 <div className="text-sm text-olive space-y-3 mb-4">
                   <div className="flex items-center gap-2 border-b border-primary/10 pb-2">
@@ -219,18 +261,31 @@ export default function MarketplacePage() {
                   </div>
                 </div>
                 
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10">
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10 gap-2">
                   <span className="text-[11px] text-olive/70 whitespace-nowrap">{new Date(item.created_at).toLocaleString()}</span>
-                  <button
-                    onClick={() => onDelete(item.id)}
-                    className="btn bg-white/80 border-primary/30 text-olive hover:bg-error/10 hover:text-error flex items-center gap-1"
-                    type="button"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onReport(item)}
+                      className="btn bg-white/80 border-primary/30 text-olive hover:bg-gold/10 hover:text-primary flex items-center gap-1"
+                      type="button"
+                    >
+                      Report
+                    </button>
+
+                    {isSuperuser && (
+                      <>
+                        {!item.verified_by_superuser && (
+                          <button
+                            onClick={async () => { try { await suVerifyCrop(item.id); await loadListings(); } catch { alert('Verify failed'); } }}
+                            className="btn bg-green-600/90 text-white hover:bg-green-700 flex items-center gap-1"
+                            type="button"
+                          >
+                            🛡️ Verify
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             );

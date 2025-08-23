@@ -2,11 +2,31 @@ from flask import Blueprint, request, jsonify
 import sqlite3
 import os
 from datetime import datetime
+import jwt
 
 marketplace_bp = Blueprint('marketplace', __name__)
 
 # Database path within backend folder
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'marketplace.db')
+
+JWT_SECRET = os.getenv('JWT_SECRET', 'change-me-in-prod')
+JWT_ALG = 'HS256'
+
+def token_from_header():
+    auth = request.headers.get('Authorization') or ''
+    if auth.lower().startswith('bearer '):
+        return auth.split(' ', 1)[1].strip()
+    return None
+
+def require_auth_payload():
+    token = token_from_header()
+    if not token:
+        return None, (jsonify({'error': 'Missing token'}), 401)
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
+        return payload, None
+    except Exception:
+        return None, (jsonify({'error': 'Invalid token'}), 401)
 
 # Ensure DB and table exist
 def init_db():
@@ -24,6 +44,23 @@ def init_db():
                 created_at TEXT NOT NULL
             )'''
         )
+        # Migrations: add owner/verification columns if missing
+        try:
+            conn.execute('ALTER TABLE listings ADD COLUMN owner_sub TEXT')
+        except Exception:
+            pass
+        try:
+            conn.execute('ALTER TABLE listings ADD COLUMN verified_by_superuser INTEGER DEFAULT 0')
+        except Exception:
+            pass
+        try:
+            conn.execute('ALTER TABLE listings ADD COLUMN verified_at TEXT')
+        except Exception:
+            pass
+        try:
+            conn.execute('ALTER TABLE listings ADD COLUMN verified_by_sub TEXT')
+        except Exception:
+            pass
         conn.commit()
     finally:
         conn.close()
@@ -46,9 +83,21 @@ def row_to_dict(row):
 def list_listings():
     conn = sqlite3.connect(DB_PATH)
     try:
-        cur = conn.execute('SELECT id, crop_name, quantity, price, location, contact, created_at FROM listings ORDER BY datetime(created_at) DESC')
+        cur = conn.execute('SELECT id, crop_name, quantity, price, location, contact, created_at, owner_sub, verified_by_superuser, verified_at, verified_by_sub FROM listings ORDER BY datetime(created_at) DESC')
         rows = cur.fetchall()
-        return jsonify([row_to_dict(r) for r in rows])
+        return jsonify([{
+            'id': r[0],
+            'crop_name': r[1],
+            'quantity': r[2],
+            'price': r[3],
+            'location': r[4],
+            'contact': r[5],
+            'created_at': r[6],
+            'owner_sub': r[7],
+            'verified_by_superuser': bool(r[8] or 0),
+            'verified_at': r[9],
+            'verified_by_sub': r[10],
+        } for r in rows])
     finally:
         conn.close()
 
@@ -66,6 +115,10 @@ def get_listing(item_id: int):
 
 @marketplace_bp.route('/', methods=['POST'])
 def create_listing():
+    payload, err = require_auth_payload()
+    if err:
+        return err
+
     data = request.get_json(silent=True) or {}
     crop_name = (data.get('crop_name') or '').strip()
     quantity = (data.get('quantity') or '').strip()
@@ -96,23 +149,33 @@ def create_listing():
     conn = sqlite3.connect(DB_PATH)
     try:
         cur = conn.execute(
-            'INSERT INTO listings (crop_name, quantity, price, location, contact, created_at) VALUES (?, ?, ?, ?, ?, ?)',
-            (crop_name, quantity, price, location, contact, created_at)
+            'INSERT INTO listings (crop_name, quantity, price, location, contact, created_at, owner_sub, verified_by_superuser, verified_at, verified_by_sub) VALUES (?, ?, ?, ?, ?, ?, ?, 0, NULL, NULL)',
+            (crop_name, quantity, price, location, contact, created_at, str(payload.get('sub')) if payload else None)
         )
         conn.commit()
         new_id = cur.lastrowid
-        return jsonify({'id': new_id, 'crop_name': crop_name, 'quantity': quantity, 'price': price, 'location': location, 'contact': contact, 'created_at': created_at}), 201
+        return jsonify({'id': new_id, 'crop_name': crop_name, 'quantity': quantity, 'price': price, 'location': location, 'contact': contact, 'created_at': created_at, 'owner_sub': str(payload.get('sub'))}), 201
     finally:
         conn.close()
 
 @marketplace_bp.route('/<int:item_id>', methods=['DELETE'])
 def delete_listing(item_id: int):
+    payload, err = require_auth_payload()
+    if err:
+        return err
+
     conn = sqlite3.connect(DB_PATH)
     try:
+        cur = conn.execute('SELECT owner_sub FROM listings WHERE id = ?', (item_id,))
+        row = cur.fetchone()
+        if not row:
+            return jsonify({'error': 'Not found'}), 404
+        owner_sub = row[0]
+        # Only owner can delete via this route; superuser has separate route
+        if str(payload.get('sub')) != (owner_sub or ''):
+            return jsonify({'error': 'forbidden'}), 403
         cur = conn.execute('DELETE FROM listings WHERE id = ?', (item_id,))
         conn.commit()
-        if cur.rowcount == 0:
-            return jsonify({'error': 'Not found'}), 404
         return jsonify({'success': True})
     finally:
         conn.close()

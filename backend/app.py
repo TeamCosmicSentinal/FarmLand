@@ -13,6 +13,8 @@ from routes.satellite_insight import satellite_insight_bp
 from routes.crop_prices import crop_prices_bp
 from routes.marketplace import marketplace_bp
 from routes.auth import auth_bp
+from routes.certification import certification_bp
+from routes.superuser import superuser_bp
 
 # Load environment variables from .env
 load_dotenv()
@@ -32,6 +34,8 @@ app.register_blueprint(satellite_insight_bp, url_prefix='/api/satellite-insight'
 app.register_blueprint(crop_prices_bp, url_prefix='/api/crop-prices')
 app.register_blueprint(marketplace_bp, url_prefix='/api/marketplace')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(certification_bp, url_prefix='/api/certification')
+app.register_blueprint(superuser_bp, url_prefix='/api/superuser')
 
 if __name__ == '__main__':
     # Use environment variable FLASK_DEBUG for local development; default to False for deployment readiness

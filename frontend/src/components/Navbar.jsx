@@ -3,24 +3,26 @@ import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import LogoutButton from './LogoutButton';
 
-const menu = [
-  { name: 'Home', path: '/' },
-  { name: 'Crop Recommendation', path: '/crop-recommendation' },
-  { name: 'Weather', path: '/weather' },
-  { name: 'Organic Tips', path: '/tips' },
-  { name: 'Government Schemes', path: '/schemes' },
-  { name: 'Crop Prices', path: '/crop-prices' },
-  { name: 'Marketplace', path: '/marketplace' },
-  { name: 'Chatbot', path: '/chatbot' },
-  { name: 'Satellite Insight', path: '/satellite-insight' },
-];
-
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const { token } = useAuth();
+  const { token, user } = useAuth();
+  const isSuperuser = user?.role === 'superuser';
+  const menu = [
+    { name: 'Home', path: '/' },
+    { name: 'Crop Recommendation', path: '/crop-recommendation' },
+    { name: 'Weather', path: '/weather' },
+    { name: 'Organic Tips', path: '/tips' },
+    { name: 'Government Schemes', path: '/schemes' },
+    { name: 'Crop Prices', path: '/crop-prices' },
+    { name: 'Marketplace', path: '/marketplace' },
+    { name: 'Certification', path: '/certification' },
+    { name: 'Satellite Insight', path: '/satellite-insight' },
+    { name: 'Chatbot', path: '/chatbot' },
+    ...(isSuperuser ? [{ name: 'Superuser', path: '/superuser' }] : []),
+  ];
   return (
     <nav className="sticky top-0 z-50 bg-primary text-offwhite shadow-md backdrop-blur supports-[backdrop-filter]:bg-primary/95 border-b border-primary-light/10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center h-14 md:h-16">
+      <div className="w-full px-3 sm:px-4 md:px-6 flex flex-wrap items-center gap-2 py-2">
         <div className="flex items-center flex-shrink-0 mr-4">
           <Link to="/" className="flex items-center text-2xl font-heading font-bold text-offwhite gap-2 hover:opacity-90 transition-opacity duration-200">
             <div className="w-10 h-10 rounded-full overflow-hidden shadow-md border-2 border-offwhite/20">
@@ -29,7 +31,7 @@ function Navbar() {
             <span className="tracking-tight">AgriGuru</span>
           </Link>
         </div>
-        <div className="flex-1 flex items-center justify-end gap-3">
+        <div className="flex-1 flex items-center justify-end gap-3 min-w-0">
           {token ? (
             <>
               <button 
@@ -42,8 +44,8 @@ function Navbar() {
                 </svg>
               </button>
               <div 
-                className={`${open ? 'block absolute bg-primary left-0 right-0 top-16 shadow-lg p-4 rounded-b-xl z-40 border-t border-primary-light/10 animate-fade-in' : 'hidden md:flex'} 
-                md:static md:bg-transparent md:shadow-none md:p-0 md:border-none md:rounded-none md:z-auto flex-col md:flex-row md:items-center gap-1 md:gap-2 font-sans font-medium`}
+                className={`${open ? 'block absolute bg-primary left-0 right-0 top-full shadow-lg p-3 rounded-b-xl z-40 border-t border-primary-light/10 animate-fade-in' : 'hidden md:flex'} 
+                md:static md:bg-transparent md:shadow-none md:p-0 md:border-none md:rounded-none md:z-auto flex-row flex-wrap md:flex-nowrap md:items-center gap-1 md:gap-2 font-sans font-medium overflow-x-auto md:overflow-visible whitespace-normal`}
               >
                 {menu.map(item => (
                   <NavLink
@@ -58,7 +60,7 @@ function Navbar() {
                     {item.name}
                   </NavLink>
                 ))}
-                <LogoutButton className="ml-2" />
+                {/* Moved logout to a fixed bottom-left button; removed from navbar */}
               </div>
             </>
           ) : (

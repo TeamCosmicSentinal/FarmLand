@@ -47,7 +47,7 @@ function Home() {
         <FeatureCard title="AI Chatbot" desc="Get instant answers to your farming questions in English, Hindi, or Kannada, powered by Gemini AI." variant="green" />
         <FeatureCard title="Satellite Insight" desc="Get NDVI and crop health insights from satellite data for your field or village." variant="gold" />
         <FeatureCard title="Marketplace" desc="List your crops in the website and let others know about the availablity of crops." variant="green" />
-        <FeatureCard title="UI" desc="Single page interface to ensure friendly interface for the farmers without any hastle." variant="gold" />
+        <FeatureCard title="Equipment Certifications" desc="Easily verify the authenticity of your farming equipment using AI-powered checks and QR code scanning." variant="gold" />
       </div>
       {/* Team Button (fixed bottom right) */}
       <button
@@ -62,26 +62,31 @@ function Home() {
       </button>
       {/* Team Modal/Card Overlay */}
       {showTeam && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-hemlock/80 backdrop-blur-sm animate-fade-in">
-          <div className="bg-offwhite rounded-2xl p-8 shadow-xl max-w-lg w-full flex flex-col items-center relative animate-fade-in text-black border border-primary/10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in px-4">
+          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-2xl max-w-3xl w-full relative text-olive border border-primary/10">
             <button
-              className="absolute top-4 right-4 text-hemlock hover:text-black text-2xl font-bold focus:outline-none hover:bg-background-alt p-1 rounded-full transition-colors"
+              className="absolute top-3 right-3 text-olive/60 hover:text-olive text-2xl font-bold focus:outline-none hover:bg-olive/5 p-1 rounded-full transition-colors"
               onClick={() => setShowTeam(false)}
               aria-label="Close Team Info"
             >
               &times;
             </button>
-            <h2 className="text-2xl font-heading font-bold text-olive mb-6 tracking-wide flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gold" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-              </svg>
-              Tech Titans
-            </h2>
-            <div className="grid grid-cols-1 gap-6 w-full">
-              <TeamMember name="Saurabh Joshi" role="Backend Developer" part="Backend/API" />
-              <TeamMember name="Trisa Das" role="Frontend Developer" part="UI & React" />
-              <TeamMember name="Nithaksha G" role="Researcher" part="Research about data and info." />
-              <TeamMember name="Chiranthan M S" role="Presentation and Theme Designing" part="Making ppt and friendly themes for UI" />
+
+            <div className="mb-6">
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-olive tracking-wide flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7 text-gold" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
+                </svg>
+                CosmicSentinal Team
+              </h2>
+              <p className="text-sm md:text-base text-olive/70 mt-1">The minds behind AgriGuru — building accessible, AI-powered tools for farmers.</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+              <TeamMember name="Saurabh Joshi" role="Backend Developer" part="APIs • Auth • DB" />
+              <TeamMember name="Trisa Das" role="Frontend Developer" part="UI • React • UX" />
+              <TeamMember name="Nithaksha G" role="Researcher" part="Data • Sources • QA" />
+              <TeamMember name="Chiranthan M S" role="Design & Presentation" part="Themes • Slides" />
             </div>
           </div>
         </div>
@@ -104,10 +109,13 @@ function FeatureCard({ title, desc, variant }) {
 
 function TeamMember({ name, role, part }) {
   return (
-    <div className="flex flex-col items-center bg-sky rounded-xl p-4 shadow-soft w-full border border-hemlock text-black">
-      <div className="text-lg font-bold mb-1">{name}</div>
-      <div className="text-black/80 text-sm font-medium text-center mb-1">{role}</div>
-      <div className="text-xs text-black text-center">{part}</div>
+    <div className="group relative flex items-center gap-4 bg-background-alt rounded-xl p-4 shadow-md w-full border border-primary/10 hover:shadow-lg transition-all">
+      <div className="w-12 h-12 rounded-full bg-gold/30 flex items-center justify-center text-primary font-heading font-bold shadow-sm">{name.split(' ').map(s=>s[0]).join('').slice(0,2)}</div>
+      <div className="flex-1">
+        <div className="text-olive font-heading font-bold text-base md:text-lg leading-tight">{name}</div>
+        <div className="text-olive/80 text-sm">{role}</div>
+        <div className="text-olive/70 text-xs mt-0.5">{part}</div>
+      </div>
     </div>
   );
 }

@@ -12,6 +12,8 @@ import AboutPage from './AboutPage';
 import SatelliteInsightPage from './SatelliteInsightPage';
 import CropPricesPage from './CropPricesPage';
 import MarketplacePage from './MarketplacePage';
+import CertificationPage from './CertificationPage';
+import SuperuserDashboard from './SuperuserDashboard';
 
 export default function ProtectedRoutes() {
   return (
@@ -35,6 +37,8 @@ export default function ProtectedRoutes() {
       <Route path="/about" element={<RequireAuth><AboutPage /></RequireAuth>} />
       <Route path="/satellite-insight" element={<RequireAuth><SatelliteInsightPage /></RequireAuth>} />
       <Route path="/marketplace" element={<RequireAuth><MarketplacePage /></RequireAuth>} />
+      <Route path="/certification" element={<RequireAuth><CertificationPage /></RequireAuth>} />
+      <Route path="/superuser" element={<RequireAuth><SuperuserDashboard /></RequireAuth>} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

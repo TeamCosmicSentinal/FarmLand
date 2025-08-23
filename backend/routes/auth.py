@@ -32,6 +32,11 @@ def init_db():
                 created_at TEXT NOT NULL
             )'''
         )
+        # Migration: add role column if missing
+        try:
+            conn.execute('ALTER TABLE users ADD COLUMN role TEXT DEFAULT "user"')
+        except Exception:
+            pass
         conn.commit()
     finally:
         conn.close()
@@ -50,6 +55,7 @@ def issue_token(user):
         'sub': str(user['id']),
         'email': user['email'],
         'name': user['name'],
+        'role': user.get('role') or 'user',
         'iat': int(now.timestamp()),
         'exp': int((now + timedelta(days=JWT_TTL_DAYS)).timestamp()),
     }
@@ -91,13 +97,14 @@ def register():
             return jsonify({'error': 'Email already registered'}), 409
         ph = generate_password_hash(password)
         created_at = datetime.utcnow().isoformat()
+        # Default role = user
         cur = conn.execute(
-            'INSERT INTO users (name, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
-            (name, email, ph, created_at)
+            'INSERT INTO users (name, email, password_hash, created_at, role) VALUES (?, ?, ?, ?, ?)',
+            (name, email, ph, created_at, 'user')
         )
         conn.commit()
         user_id = cur.lastrowid
-        user = {'id': user_id, 'name': name, 'email': email}
+        user = {'id': user_id, 'name': name, 'email': email, 'role': 'user'}
         token = issue_token(user)
         return jsonify({'token': token, 'user': user}), 201
     finally:
@@ -118,11 +125,11 @@ def login():
 
     conn = get_conn()
     try:
-        cur = conn.execute('SELECT id, name, email, password_hash FROM users WHERE email = ?', (email,))
+        cur = conn.execute('SELECT id, name, email, password_hash, role FROM users WHERE email = ?', (email,))
         row = cur.fetchone()
         if not row or not check_password_hash(row[3], password):
             return jsonify({'error': 'Invalid credentials'}), 401
-        user = {'id': row[0], 'name': row[1], 'email': row[2]}
+        user = {'id': row[0], 'name': row[1], 'email': row[2], 'role': row[4] or 'user'}
         token = issue_token(user)
         return jsonify({'token': token, 'user': user})
     finally:
@@ -136,7 +143,7 @@ def me():
         return jsonify({'error': 'Missing token'}), 401
     try:
         payload = jwt.decode(token, JWT_SECRET, algorithms=[JWT_ALG])
-        return jsonify({'user': {'id': payload.get('sub'), 'name': payload.get('name'), 'email': payload.get('email')}})
+        return jsonify({'user': {'id': payload.get('sub'), 'name': payload.get('name'), 'email': payload.get('email'), 'role': payload.get('role', 'user')}})
     except Exception:
         return jsonify({'error': 'Invalid token'}), 401
 
@@ -147,3 +154,43 @@ def logout():
         return ('', 204)
     # Stateless JWT: client should discard token. Endpoint provided for symmetry.
     return jsonify({'success': True})
+
+
+# Admin-only: set user role using a shared secret (set ADMIN_SECRET in environment)
+@auth_bp.route('/set-role', methods=['POST'])
+def set_role():
+    data = request.get_json(silent=True) or {}
+    admin_secret_env = os.getenv('ADMIN_SECRET')
+    provided = request.headers.get('X-Admin-Secret') or data.get('admin_secret')
+    if not admin_secret_env or provided != admin_secret_env:
+        return jsonify({'error': 'forbidden'}), 403
+
+    email = (data.get('email') or '').strip().lower()
+    role = (data.get('role') or '').strip().lower()
+    if role not in ('user', 'superuser'):
+        return jsonify({'error': 'invalid role'}), 400
+    if not email:
+        return jsonify({'error': 'email required'}), 400
+
+    conn = get_conn()
+    try:
+        cur = conn.execute('UPDATE users SET role = ? WHERE email = ?', (role, email))
+        conn.commit()
+        if cur.rowcount == 0:
+            return jsonify({'error': 'user not found'}), 404
+        return jsonify({'success': True, 'email': email, 'role': role})
+    finally:
+        conn.close()
+
+
+@auth_bp.route('/su-login', methods=['POST'])
+def su_login():
+    data = request.get_json(silent=True) or {}
+    admin_secret_env = os.getenv('ADMIN_SECRET')
+    provided = request.headers.get('X-Admin-Secret') or data.get('admin_secret')
+    if not admin_secret_env or provided != admin_secret_env:
+        return jsonify({'error': 'forbidden'}), 403
+    # Issue a superuser token without user record (ephemeral admin)
+    user = {'id': 'su-admin', 'name': 'Superuser', 'email': 'superuser@local', 'role': 'superuser'}
+    token = issue_token(user)
+    return jsonify({'token': token, 'user': user})

@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import AuthRoutes from './components/AuthRoutes';
 import ProtectedRoutes from './components/ProtectedRoutes';
 import { useAuth } from './components/AuthContext';
+import LogoutButton from './components/LogoutButton';
 
 function App() {
   const { token } = useAuth();
@@ -18,6 +19,11 @@ function App() {
           </div>
         </main>
         <Footer />
+        {token && (
+          <div className="fixed left-4 bottom-4 z-50">
+            <LogoutButton />
+          </div>
+        )}
       </div>
     </Router>
   );

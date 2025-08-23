@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { login as apiLogin } from '../api/api';
+import { login as apiLogin, superuserLogin } from '../api/api';
 import { useAuth } from './AuthContext';
 import './AuthInput.css';
 
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [suOpen, setSuOpen] = useState(false);
+  const [suKey, setSuKey] = useState('');
 
   const submit = async (e) => {
     e.preventDefault();
@@ -110,6 +112,54 @@ export default function LoginPage() {
       <div className="text-center mt-6 text-text-muted">
         No account yet? <Link to="/register" className="text-accent font-medium hover:text-primary transition-colors duration-200">Register</Link>
       </div>
+
+      {/* Superuser access */}
+      <div className="text-center mt-6">
+        <button
+          type="button"
+          onClick={() => setSuOpen((v) => !v)}
+          className="text-olive/70 hover:text-primary underline"
+        >
+          Superuser Login
+        </button>
+      </div>
+
+      {suOpen && (
+        <div className="mt-4 bg-background-alt border border-primary/10 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div className="font-heading font-semibold text-primary">Enter Superuser Key</div>
+            <button className="text-olive/60 hover:text-error" onClick={() => setSuOpen(false)}>✕</button>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="password"
+              value={suKey}
+              onChange={e => setSuKey(e.target.value)}
+              placeholder="Admin key"
+              className="flex-1 border border-primary/10 bg-offwhite text-text rounded-lg py-2 px-3 focus:ring-2 focus:ring-accent focus:border-accent/50 outline-none shadow-sm"
+            />
+            <button
+              type="button"
+              className="btn btn-green"
+              onClick={async () => {
+                setError(''); setLoading(true);
+                try {
+                  const res = await superuserLogin(suKey);
+                  login(res.data.token, res.data.user);
+                  navigate('/superuser', { replace: true });
+                } catch (e) {
+                  setError(e?.response?.data?.error || 'Superuser login failed');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+            >
+              Access
+            </button>
+          </div>
+          <div className="text-xs text-olive/60 mt-2">Use the private key provided by the system administrator.</div>
+        </div>
+      )}
     </div>
   );
 }
