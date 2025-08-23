@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
@@ -19,7 +19,7 @@ from routes.superuser import superuser_bp
 # Load environment variables from .env
 load_dotenv()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), '..', 'frontend', 'build'), static_url_path='/')
 # Restrict CORS in production via env FRONTEND_ORIGIN; default allows all for dev
 frontend_origin = os.getenv('FRONTEND_ORIGIN', '*')
 CORS(app, resources={r"/api/*": {"origins": frontend_origin}}, supports_credentials=False)
@@ -43,6 +43,24 @@ app.register_blueprint(superuser_bp, url_prefix='/api/superuser')
 @app.get('/health')
 def health():
     return {"status": "ok"}, 200
+
+# Serve React build (index.html) for any non-API route
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_react(path):
+    # Avoid capturing API routes
+    if path.startswith('api/'):
+        return {"error": "Not found"}, 404
+    build_dir = app.static_folder
+    index_path = os.path.join(build_dir, 'index.html')
+    try:
+        # Serve file if it exists, else serve index.html for SPA routing
+        if path and os.path.exists(os.path.join(build_dir, path)):
+            return send_from_directory(build_dir, path)
+        return send_from_directory(build_dir, 'index.html')
+    except Exception:
+        # If build is missing, show hint
+        return ("Frontend build not found. Run 'npm run build' in frontend/ and ensure files are available in frontend/build.", 500)
 
 if __name__ == '__main__':
     # Use environment variable FLASK_DEBUG for local development; default to False for deployment readiness

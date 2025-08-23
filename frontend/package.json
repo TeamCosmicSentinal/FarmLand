@@ -18,6 +18,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
+    "postbuild": "node -e \"try{require('fs').writeFileSync('build/_built.txt', new Date().toISOString())}catch(e){}\"",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
