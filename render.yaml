@@ -20,14 +20,16 @@ services:
       - key: FRONTEND_ORIGIN
         fromService:
           name: agriguru-frontend
-          type: static_site
+          type: web
           property: url
 
-  - type: static_site
+  - type: web
     name: agriguru-frontend
+    env: node
     plan: free
     buildCommand: cd frontend && npm ci && npm run build
-    staticPublishPath: frontend/build
+    startCommand: cd frontend && npx serve -s build -l $PORT
+    autoDeploy: true
     envVars:
       - key: REACT_APP_API_BASE
         fromService:
