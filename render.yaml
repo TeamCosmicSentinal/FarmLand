@@ -3,10 +3,15 @@ services:
     name: agriguru-backend
     env: python
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT backend.wsgi:application
+    buildCommand: |
+      python -m pip install --upgrade pip setuptools wheel
+      pip install -r backend/requirements.txt
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT wsgi:application
+    healthCheckPath: /health
     autoDeploy: true
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
       - key: PYTHONPATH
         value: backend
       - key: GEMINI_API_KEY
@@ -16,6 +21,10 @@ services:
       - key: MONGO_URI
         sync: false
       - key: MONGO_DB
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: ADMIN_SECRET
         sync: false
       - key: FRONTEND_ORIGIN
         fromService:
