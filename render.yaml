@@ -4,7 +4,7 @@ services:
     env: python
     plan: free
     buildCommand: pip install -r backend/requirements.txt
-    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT wsgi:application
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT backend.wsgi:application
     autoDeploy: true
     envVars:
       - key: PYTHONPATH
@@ -20,10 +20,10 @@ services:
       - key: FRONTEND_ORIGIN
         fromService:
           name: agriguru-frontend
-          type: static_site
+          type: static
           property: url
 
-  - type: static_site
+  - type: static
     name: agriguru-frontend
     plan: free
     buildCommand: cd frontend && npm ci && npm run build
