@@ -5,12 +5,11 @@ services:
     plan: free
     buildCommand: |
       pip install -r backend/requirements.txt
-      cd frontend && npm ci && npm run build && cd ..
-    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT wsgi:application
+      npm ci --prefix frontend
+      npm run build --prefix frontend
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT backend.wsgi:application
     autoDeploy: true
     envVars:
-      - key: PYTHONPATH
-        value: backend
       - key: GEMINI_API_KEY
         sync: false
       - key: OPENWEATHER_API_KEY
