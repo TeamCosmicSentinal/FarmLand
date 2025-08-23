@@ -4,12 +4,15 @@ services:
     env: python
     plan: free
     buildCommand: |
+      python -m pip install --upgrade pip setuptools wheel
       pip install -r backend/requirements.txt
       npm ci --prefix frontend
       npm run build --prefix frontend
     startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT backend.wsgi:application
     autoDeploy: true
     envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
       - key: GEMINI_API_KEY
         sync: false
       - key: OPENWEATHER_API_KEY
