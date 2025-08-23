@@ -2,19 +2,19 @@ from flask import Flask, send_from_directory
 from flask_cors import CORS
 from dotenv import load_dotenv
 import os
-from routes.crop_recommend import crop_recommend_bp
-from routes.weather import weather_bp
-from routes.tips import tips_bp
-from routes.schemes import schemes_bp
-from routes.chatbot import chatbot_bp
-from routes.crop_health import crop_health_bp
-from routes.dashboard import dashboard_bp
-from routes.satellite_insight import satellite_insight_bp
-from routes.crop_prices import crop_prices_bp
-from routes.marketplace import marketplace_bp
-from routes.auth import auth_bp
-from routes.certification import certification_bp
-from routes.superuser import superuser_bp
+from .routes.crop_recommend import crop_recommend_bp
+from .routes.weather import weather_bp
+from .routes.tips import tips_bp
+from .routes.schemes import schemes_bp
+from .routes.chatbot import chatbot_bp
+from .routes.crop_health import crop_health_bp
+from .routes.dashboard import dashboard_bp
+from .routes.satellite_insight import satellite_insight_bp
+from .routes.crop_prices import crop_prices_bp
+from .routes.marketplace import marketplace_bp
+from .routes.auth import auth_bp
+from .routes.certification import certification_bp
+from .routes.superuser import superuser_bp
 
 # Load environment variables from .env
 load_dotenv()
