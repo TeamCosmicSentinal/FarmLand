@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: agriguru-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn -w 2 -k gthread --threads 4 --timeout 120 -b 0.0.0.0:$PORT wsgi:application
+    autoDeploy: true
+    envVars:
+      - key: PYTHONPATH
+        value: backend
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: OPENWEATHER_API_KEY
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: MONGO_DB
+        sync: false
+      - key: FRONTEND_ORIGIN
+        fromService:
+          name: agriguru-frontend
+          type: static_site
+          property: url
+
+  - type: static_site
+    name: agriguru-frontend
+    plan: free
+    buildCommand: cd frontend && npm ci && npm run build
+    staticPublishPath: frontend/build
+    envVars:
+      - key: REACT_APP_API_BASE
+        fromService:
+          name: agriguru-backend
+          type: web
+          property: url

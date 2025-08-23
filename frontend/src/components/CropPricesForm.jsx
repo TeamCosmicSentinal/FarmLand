@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getCropPrices, getPopularCrops } from '../api/api';
+import CropPricesAnalytics from './CropPricesAnalytics';
 
 const CropPricesForm = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +14,7 @@ const CropPricesForm = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [loadingQuote, setLoadingQuote] = useState('');
   const [quoteIndex, setQuoteIndex] = useState(0);
+  const [showAnalytics, setShowAnalytics] = useState(false);
 
   const loadingQuotes = [
     "🌾 Fetching real-time prices from government mandis...",
@@ -170,7 +172,7 @@ const CropPricesForm = () => {
             </div>
           </div>
           
-          <div className="text-center">
+          <div className="flex items-center justify-center gap-3">
             <button
               type="submit"
               disabled={loading}
@@ -188,8 +190,21 @@ const CropPricesForm = () => {
                 'Get Real-Time Prices'
               )}
             </button>
+            <button
+              type="button"
+              onClick={() => setShowAnalytics(true)}
+              disabled={!prices}
+              className="btn-gold text-black font-semibold px-6 py-3 rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Analytics
+            </button>
           </div>
         </form>
+
+        {/* Analytics Modal */}
+        {showAnalytics && prices && (
+          <CropPricesAnalytics open={showAnalytics} onClose={() => setShowAnalytics(false)} data={prices} />
+        )}
         
         {loading && (
           <div className="mt-8 text-center">
@@ -279,7 +294,7 @@ const CropPricesForm = () => {
                     <p className="text-xs text-gray-500">per quintal</p>
                   </div>
                 </div>
-                
+
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Price Range:</span> {formatPrice(mandi.min_price)} - {formatPrice(mandi.max_price)} per quintal

@@ -20,7 +20,9 @@ from routes.superuser import superuser_bp
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}}, supports_credentials=False)
+# Restrict CORS in production via env FRONTEND_ORIGIN; default allows all for dev
+frontend_origin = os.getenv('FRONTEND_ORIGIN', '*')
+CORS(app, resources={r"/api/*": {"origins": frontend_origin}}, supports_credentials=False)
 
 # Register Blueprints
 app.register_blueprint(crop_recommend_bp, url_prefix='/api/crop-recommend')
@@ -36,6 +38,11 @@ app.register_blueprint(marketplace_bp, url_prefix='/api/marketplace')
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(certification_bp, url_prefix='/api/certification')
 app.register_blueprint(superuser_bp, url_prefix='/api/superuser')
+
+# Health check endpoint for Render
+@app.get('/health')
+def health():
+    return {"status": "ok"}, 200
 
 if __name__ == '__main__':
     # Use environment variable FLASK_DEBUG for local development; default to False for deployment readiness
