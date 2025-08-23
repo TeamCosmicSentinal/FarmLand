@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from ..services.gemini_service import ask_gemini
+from services.gemini_service import ask_gemini
 
 tips_bp = Blueprint('tips', __name__)
 

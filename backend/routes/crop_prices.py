@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 import os
 from dotenv import load_dotenv
-from ..services.crop_prices_service import get_real_crop_prices, get_popular_crops, get_market_insights
+from services.crop_prices_service import get_real_crop_prices, get_popular_crops, get_market_insights
 
 load_dotenv()
 

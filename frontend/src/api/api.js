@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Allow REACT_APP_API_BASE to be backend root; ensure trailing /api for consistency
-const rawBase = process.env.REACT_APP_API_BASE || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5000');
+const rawBase = process.env.REACT_APP_API_BASE || 'http://localhost:5000';
 const API_BASE = rawBase.endsWith('/api') ? rawBase : `${rawBase.replace(/\/$/, '')}/api`;
 
 // Axios instance to attach token when provided
