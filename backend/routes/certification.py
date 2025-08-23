@@ -4,7 +4,7 @@ import sqlite3
 from datetime import datetime, timezone
 import jwt
 
-from services.gemini_service import verify_product_certification
+from ..services.gemini_service import verify_product_certification
 
 certification_bp = Blueprint('certification', __name__)
 

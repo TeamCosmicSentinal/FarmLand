@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.gemini_service import get_crop_recommendation
+from ..services.gemini_service import get_crop_recommendation
 
 # Blueprint for crop recommendation
 crop_recommend_bp = Blueprint('crop_recommend', __name__)
